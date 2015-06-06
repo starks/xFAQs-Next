@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.5
+// @version      0.0.6
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -29,6 +29,7 @@ if(jQuery)
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
+		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	} else 
 	{
@@ -40,7 +41,8 @@ if(jQuery)
 					"searchTopics": false,
 					"enableWebm": false,
 					"enableGifv": false,
-					"enableImages": false
+					"enableImages": false,
+					"enableAvatars": "disabled"
 				}
 			],
 			"highlight-groups": [
@@ -76,6 +78,7 @@ if(jQuery)
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
+		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	}
 	
@@ -86,7 +89,8 @@ if(jQuery)
 	var upload_user = _USER_ + " ";	// used by Avatars.
 
 	// "Search Topics" At top of page
-	if(searchTopics) {
+	if(searchTopics) 
+	{
 		$(".board_nav").after($(".searchtopics").css('margin', '0'));
 	}
 	
@@ -187,6 +191,21 @@ if(jQuery)
 		});
 	}
 	
+	// Render Avatars
+	if(enableAvatars === "leftLeft")
+	{
+		// Message Display: Left
+		// Avatar Position: Left
+		
+		$(".msg_infobox").each(function( index )
+		{
+			var post_user = $(".name").eq(index).text().slice(0,-1);
+			$(".msg_infobox > .user").eq(index).after("<div style='top:45px;padding:.5em;'><img src='http://nostlagiasky.pw/gamefaqs-avatars/avatars/" + post_user +".png' /></div>");
+		});
+
+	}
+	// End Avatar Options
+	
 	// Link to the Settings Page
 	$(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
 								"</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
@@ -210,30 +229,33 @@ if(jQuery)
 		$("tbody").empty();    
 		
 				$("tbody").append( "<div id='xfaqs-tabs'>" +
-							   "<ul class='content_nav content_nav_wrap'>" +
-							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#news'>News</a></li>" +
-							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#settings'>General Settings</a></li>" +
-							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-2'>Avatar Settings</a></li>" +
-  							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-3'>User Highlighting</a></li>" +
-  							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-4'>Ignore List+</a></li>" +
-  							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-5'>Rotating Signatures</a></li>" +
-  							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-7'>Account Switcher</a></li>" +
-   							   "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-6'>About</a></li>" +
-							   "</ul>" +
+							    "<ul class='content_nav content_nav_wrap'>" +
+							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#news'>News</a></li>" +
+							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#settings'>General Settings</a></li>" +
+							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-2'>Avatar Settings</a></li>" +
+  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-3'>User Highlighting</a></li>" +
+  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-4'>Ignore List+</a></li>" +
+  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-5'>Rotating Signatures</a></li>" +
+  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-7'>Account Switcher</a></li>" +
+   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-6'>About</a></li>" +
+							    "</ul>" +
 							   
-							   "<div id='news' style='padding-top:20px'></div>" +
+							    "<div id='news' style='padding-top:20px'></div>" +
 							   
-							   "<div id='settings' style='padding-top:20px'>" +
-								   "<table class='contrib'>" +
-									   "<tr><th colspan='2'>General Settings</th></tr>" +
-									   "<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
-									   "<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
-									   "<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
-									   "<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
-									   "<tr><td style='width:50%'>Embedded Images</td><td><input type='checkbox' id='enableImages'></td></tr>" +
-									   "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
-								   "</table>" +
-							   "</div>" +
+							    "<div id='settings' style='padding-top:20px'>" +
+								    "<table class='contrib'>" +
+										"<tr><th colspan='2'>General Settings</th></tr>" +
+										"<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
+										"<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
+										"<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
+										"<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
+										"<tr><td style='width:50%'>Embedded Images</td><td><input type='checkbox' id='enableImages'></td></tr>" +
+										"<tr><td style='width:50%'>GameFAQs Avatars</td><td>" + 
+										"<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
+										"<option value='leftLeft'>Left (Message Display Left)</option></select></td></tr>" +
+										"<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
+								    "</table>" +
+							    "</div>" +
 							   
 							   
 							   /*"<div id='tabs-2' style='padding-top:20px'>" +
@@ -274,6 +296,7 @@ if(jQuery)
 		$("#enableWebm").prop('checked', _SETTINGS_.settings[0].enableWebm);
 		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
 		$("#enableImages").prop('checked', _SETTINGS_.settings[0].enableImages);
+		$("#enableAvatars").val(_SETTINGS_.settings[0].enableAvatars);
 	});
 
 	// "Save Settings"
@@ -284,6 +307,7 @@ if(jQuery)
 		_SETTINGS_.settings[0].enableWebm = $('#enableWebm').is(":checked");
 		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
 		_SETTINGS_.settings[0].enableImages = $('#enableImages').is(":checked");
+		_SETTINGS_.settings[0].enableAvatars = $('#enableAvatars').val()
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);
@@ -303,6 +327,11 @@ if(jQuery)
 	.error(function() 
 	{
 		$("#news").html("unable to get xfaqs news - your ISP could be blacklisting nostlagiasky.pw");
+	});
+
+	// Remove any broken images at the end.
+	$('img').error(function () {
+		$(this).hide();
 	});
 
 }
