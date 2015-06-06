@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.4
+// @version      0.0.5
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -28,6 +28,7 @@ if(jQuery)
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
+		var enableImages = _SETTINGS_.settings[0].enableImages;
 
 	} else 
 	{
@@ -38,7 +39,8 @@ if(jQuery)
 					"enableAMP": false,
 					"searchTopics": false,
 					"enableWebm": false,
-					"enableGifv": false
+					"enableGifv": false,
+					"enableImages": false
 				}
 			],
 			"highlight-groups": [
@@ -73,6 +75,7 @@ if(jQuery)
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
+		var enableImages = _SETTINGS_.settings[0].enableImages;
 
 	}
 	
@@ -85,6 +88,30 @@ if(jQuery)
 	// "Search Topics" At top of page
 	if(searchTopics) {
 		$(".board_nav").after($(".searchtopics").css('margin', '0'));
+	}
+	
+	if(enableImages)
+	{
+		$('.msg_body a[href$=".gif"], .msg_body a[href$=".jpg"], .msg_body a[href$=".png"], .msg_body a[href$=".bmp"], .msg_body a[href$=".jpeg"]')
+		.each(function(index, value) {
+			var href = $(this).attr("href");
+			var width;
+			
+			$(this).after(" <button id='tti-" + index +"' class='btn' style='padding-left:3px;padding-right:3px;padding-top:1px;padding-bottom:1px;'>" + 
+							"<i class='icon icon-picture'></i></button><span id='tti-image-" + index + "'></span>");
+			
+			$("#tti-image-" + index).css("max-width", width);
+
+			$("#tti-image-" + index).hide();
+			
+			$("#tti-" + index).click(function() {
+				$("#tti-image-" + index).html("<img id='tti-image-" + index + "' src='" + href + "' alt='TTI Image' style='display:block'>");
+				$("#tti-image-" + index).toggle();
+				
+			});
+		
+		});
+
 	}
 	
 	// AMP on each page.
@@ -203,6 +230,7 @@ if(jQuery)
 									   "<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
 									   "<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
 									   "<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
+									   "<tr><td style='width:50%'>Embedded Images</td><td><input type='checkbox' id='enableImages'></td></tr>" +
 									   "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
 								   "</table>" +
 							   "</div>" +
@@ -245,6 +273,7 @@ if(jQuery)
 		$("#searchTopics").prop('checked', _SETTINGS_.settings[0].searchTopics);
 		$("#enableWebm").prop('checked', _SETTINGS_.settings[0].enableWebm);
 		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
+		$("#enableImages").prop('checked', _SETTINGS_.settings[0].enableImages);
 	});
 
 	// "Save Settings"
@@ -254,6 +283,7 @@ if(jQuery)
 		_SETTINGS_.settings[0].searchTopics = $('#searchTopics').is(":checked");
 		_SETTINGS_.settings[0].enableWebm = $('#enableWebm').is(":checked");
 		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
+		_SETTINGS_.settings[0].enableImages = $('#enableImages').is(":checked");
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);
