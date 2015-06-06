@@ -2,6 +2,7 @@
 xFAQs For the New Message Board Beta
 
 Note: Please use the *[Allman Style](http://en.wikipedia.org/wiki/Indent_style#Allman_style)* of Indendting.
+I am trying to convert the code from Kernel to Allman because Allman is more readable.
 
 That will probably be included in a style-guide once I get this set up.
 
