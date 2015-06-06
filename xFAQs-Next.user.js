@@ -26,6 +26,7 @@ if(jQuery)
 	{
 		var _SETTINGS_ = JSON.parse(localStorage.getItem("_SETTINGS_"));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+		var disableTinyNav = _SETTINGS_.settings[0].disableTinyNav;
 
 	} else 
 	{
@@ -33,7 +34,8 @@ if(jQuery)
 		{ 	
 			"settings": [
 				{
-					"enableAMP": false
+					"enableAMP": false,
+					"disableTinyNav": false
 				}
 			],
 			"highlight-groups": [
@@ -75,7 +77,7 @@ if(jQuery)
 	var upload_user = _USER_ + " ";	// used by Avatars.
 
 	
-	// TEST: AMP on each page.
+	// AMP on each page.
 	if(enableAMP)
 	{
 		var ampURL = "http://www.gamefaqs.com/users/" + _USER_ + "/boards";
@@ -92,6 +94,12 @@ if(jQuery)
 			});
 
 		}		
+	}
+	
+	// Disable TinyNav
+	if(disableTinyNav)
+	{
+		$(".tinynav").hide();
 	}
 
 	// Link to the Settings Page
@@ -134,6 +142,7 @@ if(jQuery)
 								   "<table class='contrib'>" +
 									   "<tr><th colspan='2'>General Settings</th></tr>" +
 									   "<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
+									   "<tr><td style='width:50%'>Hide Tiny Navigation (Breadcrumbs)</td><td><input type='checkbox' id='disableTinyNav'></td></tr>" +
 									   "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
 								   "</table>" +
 							   "</div>" +
@@ -173,12 +182,14 @@ if(jQuery)
 	// "Load Settings"
 	$(function() {
 		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
+		$("#disableTinyNav").prop('checked', _SETTINGS_.settings[0].disableTinyNav);
 	});
 
 	// "Save Settings"
 	$("#updateGeneral").button();
 	$("#updateGeneral").click(function(event) {
 		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
+		_SETTINGS_.settings[0].disableTinyNav = $('#disableTinyNav').is(":checked");
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);

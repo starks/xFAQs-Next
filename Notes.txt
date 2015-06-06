@@ -37,3 +37,15 @@ Basic Structure:
 
 Goal is to combine my other JSON structures into one local storage object. Settings are
 Parsed from this data. You should only use the _SETTINGS_ global to store settings.
+
+Saving Settings
+- Use the #updateGeneral click event
+
+Loading current settings into the settings page
+- Use the load settings function
+
+	// "Load Settings"
+	$(function() {
+		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
+		$("#enableFoo").prop('checked', _SETTINGS_.settings[0].enableFoo);	// example
+	});
