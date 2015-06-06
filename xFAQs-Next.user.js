@@ -13,7 +13,7 @@
 
 // TODOs:
 // 1. Settings JSON
-// 3. Get the "MASTER" User Variable to 
+// 3. Get the "MASTER" User Variable to work in all cases
 // 2. Settings Page (In the same Style as xfaqs does now)
 
 
