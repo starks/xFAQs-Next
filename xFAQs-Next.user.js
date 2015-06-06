@@ -169,6 +169,20 @@ if(jQuery)
 	$(function() {
 		$("#xfaqs-tabs").tabs();
 	});
+	
+	// "Load Settings"
+	$(function() {
+		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
+	});
+
+	// "Save Settings"
+	$("#updateGeneral").button();
+	$("#updateGeneral").click(function(event) {
+		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
+		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		document.location = "/boards/user.php?settings=1#settings";
+		location.reload(true);
+	});
 	// End Settings Page
 
 	// ajax call to load the news page
@@ -185,19 +199,6 @@ if(jQuery)
 	{
 		$("#news").html("unable to get xfaqs news - your ISP could be blacklisting nostlagiasky.pw");
 	});
-	
-
-	$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
-	
-	// "Save Settings"
-	$("#updateGeneral").button();
-	$("#updateGeneral").click(function(event) {
-		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
-		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
-		document.location = "/boards/user.php?settings=1#settings";
-		location.reload(true);
-	});
-
 
 }
 else
