@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.3
+// @version      0.0.4
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -12,7 +12,6 @@
 // https://github.com/Kraust/xFAQs-Next
 
 // TODOs:
-// 1. Settings JSON - Partial
 // 3. Get the "MASTER" User Variable to work in all cases
 // 2. Settings Page (In the same Style as xfaqs does now) - Partial}
 
@@ -26,8 +25,9 @@ if(jQuery)
 	{
 		var _SETTINGS_ = JSON.parse(localStorage.getItem("_SETTINGS_"));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
-		var disableTinyNav = _SETTINGS_.settings[0].disableTinyNav;
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
+		var enableWebm = _SETTINGS_.settings[0].enableWebm;
+		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 
 	} else 
 	{
@@ -36,8 +36,9 @@ if(jQuery)
 			"settings": [
 				{
 					"enableAMP": false,
-					"disableTinyNav": false,
-					"searchTopics": false
+					"searchTopics": false,
+					"enableWebm": false,
+					"enableGifv": false
 				}
 			],
 			"highlight-groups": [
@@ -69,8 +70,9 @@ if(jQuery)
 		};
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
-		var disableTinyNav = _SETTINGS_.settings[0].disableTinyNav;
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
+		var enableWebm = _SETTINGS_.settings[0].enableWebm;
+		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 
 	}
 	
@@ -103,13 +105,61 @@ if(jQuery)
 
 		}		
 	}
-	
-	// Disable TinyNav
-	if(disableTinyNav)
-	{
-		$(".tinynav").hide();
-	}
 
+	// Webm
+	if(enableWebm)
+	{
+		$('a[href$=".webm"], a[href$=".WebM"], a[href$=".webM"], a[href$=".webM"]').each(function(index, value) 
+		{
+			var href = $(this).attr("href");
+			
+			$(this).after(" <button id='webm-" + index +"' class='btn' style='padding-left:3px;padding-right:3px;padding-top:1px;padding-bottom:1px'><i class='icon icon-play-circle'></i></button><div id='webm-image-" + 
+							index + "'><video controls><source src=\"" + href + "\" type=\'video/webm; codecs=\"vp8, vorbis\"\'></video></div>");
+			
+			$("#webm-image-" + index).hide();
+			
+			$("#webm-" + index).click(function() 
+			{
+				$("#webm-image-" + index).toggle();
+				if( $("#webm-image-" + index + " > video").is(":hidden") )
+				{
+					$("#webm-image-" + index + " > video").get(0).pause();
+				}
+
+			});
+			
+		});
+	}
+	
+	// Gifv
+	if(enableGifv)
+	{
+		$('a[href$=".gifv"]').each(function(index, value) 
+		{
+			var href = $(this).attr("href");
+			
+			$(this).after(" <button id='gifv-" + index +"' class='btn' style='padding-left:3px;padding-right:3px;padding-top:1px;padding-bottom:1px'><i class='icon icon-play-circle'></i></button><div id='gifv-image-" + 
+							index + "'><video controls loop autoplay><source src=\"" + href.replace(".gifv", ".webm") + "\" type=\'video/webm; codecs=\"vp8, vorbis\"\'></video></div>");
+			
+			$("#gifv-image-" + index).hide();
+			
+			$("#gifv-" + index).click(function() 
+			{
+				$("#gifv-image-" + index).toggle();
+				if( $("#gifv-image-" + index + " > video").is(":hidden") )
+				{
+					$("#gifv-image-" + index + " > video").get(0).pause();
+				}
+				else
+				{
+					$("#gifv-image-" + index + " > video").get(0).play();
+				}
+
+			});
+			
+		});
+	}
+	
 	// Link to the Settings Page
 	$(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
 								"</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
@@ -150,8 +200,9 @@ if(jQuery)
 								   "<table class='contrib'>" +
 									   "<tr><th colspan='2'>General Settings</th></tr>" +
 									   "<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
-									   "<tr><td style='width:50%'>Hide Tiny Navigation (Breadcrumbs)</td><td><input type='checkbox' id='disableTinyNav'></td></tr>" +
 									   "<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
+									   "<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
+									   "<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
 									   "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
 								   "</table>" +
 							   "</div>" +
@@ -191,16 +242,18 @@ if(jQuery)
 	// "Load Settings"
 	$(function() {
 		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
-		$("#disableTinyNav").prop('checked', _SETTINGS_.settings[0].disableTinyNav);
 		$("#searchTopics").prop('checked', _SETTINGS_.settings[0].searchTopics);
+		$("#enableWebm").prop('checked', _SETTINGS_.settings[0].enableWebm);
+		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
 	});
 
 	// "Save Settings"
 	$("#updateGeneral").button();
 	$("#updateGeneral").click(function(event) {
 		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
-		_SETTINGS_.settings[0].disableTinyNav = $('#disableTinyNav').is(":checked");
 		_SETTINGS_.settings[0].searchTopics = $('#searchTopics').is(":checked");
+		_SETTINGS_.settings[0].enableWebm = $('#enableWebm').is(":checked");
+		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);
