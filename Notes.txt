@@ -1,0 +1,39 @@
+Settings (localStorage)
+
+Porting this over from the xfaqs Code:
+
+Basic Structure:
+
+{ 	
+	"settings": [
+		{
+			"enableAMP": true,
+			"enableTTI": true
+		}
+	],
+	"highlight-groups": [
+	
+		{
+			"groupName": "xFAQs Creator",
+			"color": "#FFD9D9",
+			"userNames": [ "Judgmenl" ] 
+		}
+	
+	],
+	
+	"ignored-users": [
+			
+	],
+	
+	"signatures": [
+			{
+				"boards": [""],
+				"accounts": [""],
+				"signature": "powered by xfaqs"
+			}
+	]
+
+}
+
+Goal is to combine my other JSON structures into one local storage object. Settings are
+Parsed from this data. You should only use the _SETTINGS_ global to store settings.

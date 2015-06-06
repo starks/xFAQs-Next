@@ -12,7 +12,7 @@
 // https://github.com/Kraust/xFAQs-Next
 
 // TODOs:
-// 1. Settings JSON
+// 1. Settings JSON - Partial
 // 3. Get the "MASTER" User Variable to work in all cases
 // 2. Settings Page (In the same Style as xfaqs does now)
 
@@ -20,11 +20,58 @@
 // Note: jQuery is provided by GameFAQs by default. I will be using it a lot in this code.
 if(jQuery) 
 {
+	// The _SETTINGS_ Global
+	// Use this to store user settings.
+	if(	localStorage.getItem("_SETTINGS_") != null ) 
+	{
+		var _SETTINGS_ = JSON.parse(localStorage.getItem("_SETTINGS_"));
+		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+
+	} else 
+	{
+		var _SETTINGS_ =
+		{ 	
+			"settings": [
+				{
+					"enableAMP": false
+				}
+			],
+			"highlight-groups": [
+			
+				{
+					"groupName": "xFAQs Creator",
+					"color": "#FFD9D9",
+					"userNames": [ "Judgmenl" ] 
+				}
+			
+			],
+			
+			"ignored-users": [
+					
+			],
+			
+			"signatures": [
+					{
+						"boards": [""],
+						"accounts": [""],
+						"signature": "powered by xfaqs"
+					}
+			],
+			
+			"accounts": [
+		
+			]
+
+		};
+		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+
+	}
+	
 	// The "MASTER" user variable should be used in any case where you want the user's name.
 	// I forget how to get the "accurate" Username... There are a few ways to get it. Going to use the welcome class for now.
 	// This may be the incompatible one.
 	var _USER_ = $(".welcome").text().slice(0, - 1).replace(/ /g,"_");
-	var enableAMP = true; // TODO: Add JSON Settings
 	
 	// TEST: AMP on each page.
 	if(enableAMP)
@@ -39,7 +86,7 @@ if(jQuery)
 			.done(function(response) 
 			{
 				var amp = $(response).find("#content > div > div > div > table > tbody:nth-child(3) > tr:nth-child(8) > td:nth-child(2)").text();
-				$(".paginate.user > li ").eq(0).after("<li><a href='http://www.gamefaqs.com/boards/myposts.php?'>" + amp + "AMP</a></li>");
+				$(".paginate.user > .unav").after("<li><a href='http://www.gamefaqs.com/boards/myposts.php?'>" + amp + "AMP</a></li>");
 			});
 
 		}		
