@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.6
+// @version      0.0.7
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -200,7 +200,7 @@ if(jQuery)
 		$(".msg_infobox").each(function( index )
 		{
 			var post_user = $(".name").eq(index).text().slice(0,-1);
-			$(".msg_infobox > .user").eq(index).after("<div style='top:45px;padding:.5em;'><img src='http://nostlagiasky.pw/gamefaqs-avatars/avatars/" + post_user +".png' /></div>");
+			$(".msg_infobox > .user").eq(index).after("<img src='http://nostlagiasky.pw/gamefaqs-avatars/avatars/" + post_user +".png' />");
 		});
 
 	}
@@ -232,7 +232,7 @@ if(jQuery)
 							    "<ul class='content_nav content_nav_wrap'>" +
 							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#news'>News</a></li>" +
 							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#settings'>General Settings</a></li>" +
-							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-2'>Avatar Settings</a></li>" +
+							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#avatars'>GameFAQs Avatars</a></li>" +
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-3'>User Highlighting</a></li>" +
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-4'>Ignore List+</a></li>" +
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-5'>Rotating Signatures</a></li>" +
@@ -258,24 +258,20 @@ if(jQuery)
 							    "</div>" +
 							   
 							   
-							   /*"<div id='tabs-2' style='padding-top:20px'>" +
-									
-									"<div style='float:left; width:100px; height:100px;'><img class='avatar' src='http://www." + avatarDomain + "/gamefaqs-avatars/avatars/" + user + ".png' alt='' ></div>" +
-									"<div style='float:left; padding-left:10px'><h4>Global Avatar Settings</h4> <ul id=settings class='paginate user' style='margin:0;padding:0;'> \
-										<li><a id='av_left'>Avatars to the Left</a></li><li><a id='av_right'>Avatars to the Right</a></li><li><a id='av_no'>No Avatars</a></li><li><a id='av_remove'>Remove Avatar</a></li></ul> \
-										<form id='submit' method='POST' enctype='multipart/form-data' > \
-										<input class='btn' type='file' name='file' accept='image/*' id='file'> \
-										<input class='btn btn_primary' type='button' id='submit_btn' value='Upload'> \
-										<input style='display:none' type='text' name='dest' value='GameFAQs-Avatars'> \
-										<input style='display:none' type='text' name='user' value='" + upload_user + "'> \
-										<span id='server_message'>Maximum File Size: 200KB</span> \
-										</form></div>" +
-										
+							   "<div id='avatars' style='padding-top:20px'>" +
+									"<div style='float:left; width:100px; height:100px;'><img class='avatar' src='http://www.nostlagiasky.pw/gamefaqs-avatars/avatars/" + _USER_ + ".png' alt='' ></div>" +
+									"<div style='float:left; padding-left:10px'><h4>GameFAQs Avatars</h4> <ul id=settings class='paginate user' style='margin:0;padding:0;'> " +
+										"<form id='submit' method='POST' enctype='multipart/form-data' > " +
+										"<input class='btn' type='file' name='file' accept='image/*' id='file'> " +
+										"<input class='btn btn_primary' type='button' id='submit_btn' value='Upload'> " +
+										"<input style='display:none' type='text' name='dest' value='GameFAQs-Avatars'> " +
+										"<input style='display:none' type='text' name='user' value='" + upload_user + "'> " +
+										"<span id='server_message'>Maximum File Size: 200KB</span> " +
+										"</form></div>" +
 										"<div style='clear:both;padding-top:30px;'>Upload an avatar, and select upload. If your upload fails, then you will get a message telling you why.<br>\
                                         Please note: This process modifies your signature, however you should get your old signature back.<br>\
                                         If your signature is set to upload:ok it will be removed.</div>" +
-											
-							   "</div>" +*/
+							   "</div>" +
    							   //"<div id='tabs-3' style='padding-top:20px'>" + highlightBody + "</div>" +
    							   //"<div id='tabs-4' style='padding-top:20px'>" + ignoreBody + "</div>" +
    							   //"<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
@@ -333,6 +329,132 @@ if(jQuery)
 	$('img').error(function () {
 		$(this).hide();
 	});
+	
+	// Avatars stuff
+	$("#file").change(function() {
+		var file = this.files[0];
+		var size = file.size;
+		var type = file.type;
+		
+		if( !type.match(/image.*/) ) {
+			$("#submit_btn").css("display", "none");
+			$("#server_message").html("Invalid File Type");
+			return;		
+		}
+		
+		if( size > 204800 ) {
+			$("#submit_btn").css("display", "none");
+			$("#server_message").html("Image is too big (" + size/1024 + "KB). 200KB maximum.");
+			return;
+		}
+		
+		if( !_USER_ ) {
+			$("#submit_btn").css("display", "none");
+			$("#server_message").html("Log in to upload avatars.");
+		}
+		
+		$("#submit_btn").css("display", "inline");
+		$("#server_message").html("OK");
+	});
+	
+	// ajax request that handles the upload.
+	// For the love of god do not modify this. Bad things will happen.
+
+	$("#submit_btn").click( function() {
+		var formData = new FormData($('#submit')[0]);
+
+		$("#server_message").html("backing up signature...");
+
+		$.ajax
+		({
+			type: "POST",
+			url: "/boards/sigquote.php",
+			async: false,
+		})
+		.done(function(response) 
+		{
+			var sig = $(response).find("#sig").text();
+			var quote = $(response).find("#quote").text();
+			var key = $(response).find("input[name=key]").eq(0).attr("value");
+			var sigpost = $(response).find("#add").attr("action");
+			//console.log(sig);
+			//console.log(key);
+			//console.log(sigpost);
+
+
+			if((sig == "upload:ok") || (sig == "avatarupload:true"))
+			{
+				// replace old signature
+				sig = "";
+			}
+
+			$("#server_message").html("Sending permission to change sig");
+
+			$.ajax
+			({
+				type: "POST",
+				url: sigpost,
+				data: "key=" + key + "&sig=" + "avatarupload:true" + "&quote=" + quote + "&submit=Change Settings",
+			})
+			.done(function(response) 
+			{
+				$("#server_message").html("Uploading...");
+				$.ajax( {
+					url: "http://www.nostlagiasky.pw/gamefaqs-avatars/upload-v2.php",
+					dataType: "html",
+					type: "POST",
+					data: formData,
+					processData: false,
+					contentType: false,
+					async: false
+				}).done(function( data ) {
+					if( data == 'Upload Successful! Refreshing to apply changes...') 
+					{
+						$.ajax
+						({
+							type: "POST",
+							url: sigpost,
+							data: "key=" + key + "&sig=" + sig + "&quote=" + quote + "&submit=Change Settings",
+						})
+						.done(function(response) 
+						{
+							//console.log("Sig changed back.");
+							$("#server_message").html(data);
+							location.href = "http://www.gamefaqs.com/boards/user.php?settings=1#tabs-2";
+							location.reload(true);
+						});
+					}
+					else 
+					{
+						$.ajax
+						({
+							type: "POST",
+							url: sigpost,
+							data: "key=" + key + "&sig=" + sig + "&quote=" + quote + "&submit=Change Settings",
+						}).done(function(response) 
+						{
+							//console.log("Sig changed back.");
+						});
+						$("#server_message").html(data);
+					}
+				}).error(function() {
+					$.ajax
+					({
+						type: "POST",
+						url: sigpost,
+						data: "key=" + key + "&sig=" + sig + "&quote=" + quote + "&submit=Change Settings",
+					})
+					.done(function(response) 
+					{
+						//console.log("Sig changed back.");
+					});
+					$("#server_message").html("Avatar not uploaded to nostlagiasky domain. Service may be unavailable.");
+				});
+			});
+		});
+	});
+	// End Avatars Stuff
+
 
 }
 else
