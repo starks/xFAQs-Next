@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.2
+// @version      0.0.3
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -27,6 +27,7 @@ if(jQuery)
 		var _SETTINGS_ = JSON.parse(localStorage.getItem("_SETTINGS_"));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
 		var disableTinyNav = _SETTINGS_.settings[0].disableTinyNav;
+		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 
 	} else 
 	{
@@ -35,7 +36,8 @@ if(jQuery)
 			"settings": [
 				{
 					"enableAMP": false,
-					"disableTinyNav": false
+					"disableTinyNav": false,
+					"searchTopics": false
 				}
 			],
 			"highlight-groups": [
@@ -67,6 +69,8 @@ if(jQuery)
 		};
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+		var disableTinyNav = _SETTINGS_.settings[0].disableTinyNav;
+		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 
 	}
 	
@@ -76,6 +80,10 @@ if(jQuery)
 	var _USER_ = $(".welcome").text().slice(0, - 1).replace(/ /g,"_");
 	var upload_user = _USER_ + " ";	// used by Avatars.
 
+	// "Search Topics" At top of page
+	if(searchTopics) {
+		$(".board_nav").after($(".searchtopics").css('margin', '0'));
+	}
 	
 	// AMP on each page.
 	if(enableAMP)
@@ -143,6 +151,7 @@ if(jQuery)
 									   "<tr><th colspan='2'>General Settings</th></tr>" +
 									   "<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
 									   "<tr><td style='width:50%'>Hide Tiny Navigation (Breadcrumbs)</td><td><input type='checkbox' id='disableTinyNav'></td></tr>" +
+									   "<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
 									   "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
 								   "</table>" +
 							   "</div>" +
@@ -183,6 +192,7 @@ if(jQuery)
 	$(function() {
 		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
 		$("#disableTinyNav").prop('checked', _SETTINGS_.settings[0].disableTinyNav);
+		$("#searchTopics").prop('checked', _SETTINGS_.settings[0].searchTopics);
 	});
 
 	// "Save Settings"
@@ -190,6 +200,7 @@ if(jQuery)
 	$("#updateGeneral").click(function(event) {
 		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
 		_SETTINGS_.settings[0].disableTinyNav = $('#disableTinyNav').is(":checked");
+		_SETTINGS_.settings[0].searchTopics = $('#searchTopics').is(":checked");
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);
