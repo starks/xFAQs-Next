@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.1
+// @version      0.0.2
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -185,6 +185,19 @@ if(jQuery)
 	{
 		$("#news").html("unable to get xfaqs news - your ISP could be blacklisting nostlagiasky.pw");
 	});
+	
+
+	$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
+	
+	// "Save Settings"
+	$("#updateGeneral").button();
+	$("#updateGeneral").click(function(event) {
+		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
+		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		document.location = "/boards/user.php?settings=1#settings";
+		location.reload(true);
+	});
+
 
 }
 else
