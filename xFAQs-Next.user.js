@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.7
+// @version      0.0.8
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -29,6 +29,7 @@ if(jQuery)
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
+		var enableYoutube = _SETTINGS_.settings[0].enableYoutube;
 		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	} else 
@@ -42,6 +43,7 @@ if(jQuery)
 					"enableWebm": false,
 					"enableGifv": false,
 					"enableImages": false,
+					"enableYoutube": false,
 					"enableAvatars": "disabled"
 				}
 			],
@@ -78,6 +80,7 @@ if(jQuery)
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
+		var enableYoutube = _SETTINGS_.settings[0].enableYoutube;
 		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	}
@@ -191,6 +194,23 @@ if(jQuery)
 		});
 	}
 	
+	// Embedded Youtube
+	if(enableYoutube)
+	{
+		var ytregex = /(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]{11})[a-z0-9;:@#?&%=+\/\$_.-]*/
+		$('td.msg a').each(function(i, v){
+			if(ytregex.test($(this).attr('href'))) {
+				var id = ytregex.exec($(this).attr('href'))[1];
+				$(this).after(" <button id='yt-" + i +"' class='btn' style='padding-left:3px;padding-right:3px;padding-top:1px;padding-bottom:1px;'><i class='icon icon-play-circle'></i></button><div id='yt-image-" + 
+								i + "'><iframe width='720' height='480' src='http://www.youtube.com/embed/" + id + "' frameborder='0' allowfullscreen></iframe>");
+				$("#yt-image-" + i).hide();
+				$("#yt-" + i).click(function() {
+					$("#yt-image-" + i).toggle();
+				});
+			}
+		});
+	}
+	
 	// Render Avatars
 	if(enableAvatars === "leftLeft")
 	{
@@ -250,6 +270,7 @@ if(jQuery)
 										"<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
 										"<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
 										"<tr><td style='width:50%'>Embedded Images</td><td><input type='checkbox' id='enableImages'></td></tr>" +
+										"<tr><td style='width:50%'>Embedded Youtube</td><td><input type='checkbox' id='enableYoutube'></td></tr>" +
 										"<tr><td style='width:50%'>GameFAQs Avatars</td><td>" + 
 										"<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
 										"<option value='leftLeft'>Left (Message Display Left)</option></select></td></tr>" +
@@ -292,6 +313,7 @@ if(jQuery)
 		$("#enableWebm").prop('checked', _SETTINGS_.settings[0].enableWebm);
 		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
 		$("#enableImages").prop('checked', _SETTINGS_.settings[0].enableImages);
+		$("#enableYoutube").prop('checked', _SETTINGS_.settings[0].enableYoutube);
 		$("#enableAvatars").val(_SETTINGS_.settings[0].enableAvatars);
 	});
 
@@ -303,6 +325,7 @@ if(jQuery)
 		_SETTINGS_.settings[0].enableWebm = $('#enableWebm').is(":checked");
 		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
 		_SETTINGS_.settings[0].enableImages = $('#enableImages').is(":checked");
+		_SETTINGS_.settings[0].enableYoutube = $('#enableYoutube').is(":checked");
 		_SETTINGS_.settings[0].enableAvatars = $('#enableAvatars').val()
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
