@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.8
+// @version      0.0.9
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        *.gamefaqs.com/*
@@ -30,6 +30,7 @@ if(jQuery)
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
 		var enableYoutube = _SETTINGS_.settings[0].enableYoutube;
+		var msgBelowLeftOfPost = _SETTINGS_.settings[0].msgBelowLeftOfPost;
 		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	} else 
@@ -44,6 +45,7 @@ if(jQuery)
 					"enableGifv": false,
 					"enableImages": false,
 					"enableYoutube": false,
+					"msgBelowLeftOfPost": false,
 					"enableAvatars": "disabled"
 				}
 			],
@@ -81,6 +83,7 @@ if(jQuery)
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
 		var enableImages = _SETTINGS_.settings[0].enableImages;
 		var enableYoutube = _SETTINGS_.settings[0].enableYoutube;
+		var msgBelowLeftOfPost = _SETTINGS_.settings[0].msgBelowLeftOfPost;
 		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
 
 	}
@@ -211,6 +214,23 @@ if(jQuery)
 		});
 	}
 	
+	// Quote, Edit, Delete, Report... In Left of Post
+	if(msgBelowLeftOfPost)
+	{
+		$(".msg_below").css("position", "relative");
+		$(".msg_below").each(function(index){
+			$(this).parent().prev().append($(this).detach());
+		});
+
+		$(".message_num").each(function(index){
+			$(this).parent().append($(this).detach());
+		});
+
+		$(".edited").css("display", "block");
+		$(".action_after").hide();
+		$(".options").css("float", "none");
+	}
+	
 	// Render Avatars
 	if(enableAvatars === "leftLeft")
 	{
@@ -271,6 +291,7 @@ if(jQuery)
 										"<tr><td style='width:50%'>Embedded Gifv</td><td><input type='checkbox' id='enableGifv'></td></tr>" +
 										"<tr><td style='width:50%'>Embedded Images</td><td><input type='checkbox' id='enableImages'></td></tr>" +
 										"<tr><td style='width:50%'>Embedded Youtube</td><td><input type='checkbox' id='enableYoutube'></td></tr>" +
+										"<tr><td style='width:50%'>quote, edit, ect. in Message Display Left</td><td><input type='checkbox' id='msgBelowLeftOfPost'></td></tr>" +
 										"<tr><td style='width:50%'>GameFAQs Avatars</td><td>" + 
 										"<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
 										"<option value='leftLeft'>Left (Message Display Left)</option></select></td></tr>" +
@@ -314,6 +335,7 @@ if(jQuery)
 		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
 		$("#enableImages").prop('checked', _SETTINGS_.settings[0].enableImages);
 		$("#enableYoutube").prop('checked', _SETTINGS_.settings[0].enableYoutube);
+		$("#msgBelowLeftOfPost").prop('checked', _SETTINGS_.settings[0].msgBelowLeftOfPost);
 		$("#enableAvatars").val(_SETTINGS_.settings[0].enableAvatars);
 	});
 
@@ -326,6 +348,7 @@ if(jQuery)
 		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
 		_SETTINGS_.settings[0].enableImages = $('#enableImages').is(":checked");
 		_SETTINGS_.settings[0].enableYoutube = $('#enableYoutube').is(":checked");
+		_SETTINGS_.settings[0].msgBelowLeftOfPost = $('#msgBelowLeftOfPost').is(":checked");
 		_SETTINGS_.settings[0].enableAvatars = $('#enableAvatars').val()
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
