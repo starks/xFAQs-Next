@@ -4,7 +4,7 @@
 // @version      0.0.9
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
-// @match        *.gamefaqs.com/*
+// @match        http://*.gamefaqs.com/*
 // @grant        none
 // ==/UserScript==
 
@@ -25,6 +25,7 @@ if(jQuery)
 	{
 		var _SETTINGS_ = JSON.parse(localStorage.getItem("_SETTINGS_"));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+        var enablePopular = _SETTINGS_.settings[0].enablePopular;
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
@@ -40,6 +41,7 @@ if(jQuery)
 			"settings": [
 				{
 					"enableAMP": false,
+					"enablePopular": false,
 					"searchTopics": false,
 					"enableWebm": false,
 					"enableGifv": false,
@@ -78,6 +80,7 @@ if(jQuery)
 		};
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		var enableAMP = _SETTINGS_.settings[0].enableAMP;
+		var enablePopular = _SETTINGS_.settings[0].enablePopular;
 		var searchTopics = _SETTINGS_.settings[0].searchTopics;
 		var enableWebm = _SETTINGS_.settings[0].enableWebm;
 		var enableGifv = _SETTINGS_.settings[0].enableGifv;
@@ -142,6 +145,11 @@ if(jQuery)
 
 		}		
 	}
+    
+    if(enablePopular)
+    {
+        $(".paginate.user > .unav").after("<li><a href='http://www.gamefaqs.com/boards/popular.php?'>Popular</a></li>");
+    }
 
 	// Webm
 	if(enableWebm)
@@ -285,6 +293,7 @@ if(jQuery)
 							    "<div id='settings' style='padding-top:20px'>" +
 								    "<table class='contrib'>" +
 										"<tr><th colspan='2'>General Settings</th></tr>" +
+										"<tr><td style='width:50%'>Popular Topics in Board Navigation</td><td><input type='checkbox' id='enablePopular'></td></tr>" +
 										"<tr><td style='width:50%'>AMP in Board Navigation</td><td><input type='checkbox' id='enableAMP'></td></tr>" +
 										"<tr><td style='width:50%'>\"Search Topics\" at top of topic list.</td><td><input type='checkbox' id='searchTopics'></td></tr>" +
 										"<tr><td style='width:50%'>Embedded Webm</td><td><input type='checkbox' id='enableWebm'></td></tr>" +
@@ -330,6 +339,7 @@ if(jQuery)
 	// "Load Settings"
 	$(function() {
 		$("#enableAMP").prop('checked', _SETTINGS_.settings[0].enableAMP);
+		$("#enablePopular").prop('checked', _SETTINGS_.settings[0].enablePopular);
 		$("#searchTopics").prop('checked', _SETTINGS_.settings[0].searchTopics);
 		$("#enableWebm").prop('checked', _SETTINGS_.settings[0].enableWebm);
 		$("#enableGifv").prop('checked', _SETTINGS_.settings[0].enableGifv);
@@ -343,6 +353,7 @@ if(jQuery)
 	$("#updateGeneral").button();
 	$("#updateGeneral").click(function(event) {
 		_SETTINGS_.settings[0].enableAMP = $('#enableAMP').is(":checked");
+		_SETTINGS_.settings[0].enablePopular = $('#enablePopular').is(":checked");
 		_SETTINGS_.settings[0].searchTopics = $('#searchTopics').is(":checked");
 		_SETTINGS_.settings[0].enableWebm = $('#enableWebm').is(":checked");
 		_SETTINGS_.settings[0].enableGifv = $('#enableGifv').is(":checked");
