@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.0.9
+// @version      0.1.0
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -33,6 +33,7 @@ if(jQuery)
 		var enableYoutube = _SETTINGS_.settings[0].enableYoutube;
 		var msgBelowLeftOfPost = _SETTINGS_.settings[0].msgBelowLeftOfPost;
 		var enableAvatars = _SETTINGS_.settings[0].enableAvatars;
+		var enableAccountSwitcher = _SETTINGS_.settings[0].enableAccountSwitcher;
 
 	} else 
 	{
@@ -48,7 +49,8 @@ if(jQuery)
 					"enableImages": false,
 					"enableYoutube": false,
 					"msgBelowLeftOfPost": false,
-					"enableAvatars": "disabled"
+					"enableAvatars": "disabled",
+					"enableAccountSwitcher": false
 				}
 			],
 			"highlight-groups": [
@@ -254,6 +256,146 @@ if(jQuery)
 	}
 	// End Avatar Options
 	
+	// Account Switcher
+	
+	function asAddCallback(i)
+	{
+		return function()
+		{
+
+			$("#asAdd").attr("disabled", "disabled");
+						
+			_SETTINGS_.accounts.push( 
+				{
+					"name": $("#asUser-" + i).val(),
+					"pass": $("#asPass-" + i).val()
+				});
+
+		
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+			document.location = "/boards/user.php?settings=1#tabAccountSwitcher";
+			location.reload(true);
+			
+		}
+	}
+
+	function asDeleteCallback(i) 
+	{
+		return function()
+		{
+			$("#asDeleteBtn-" + i).attr("disabled", "disabled");
+			
+			_SETTINGS_.accounts.splice((i-1), 1);
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+			
+			document.location = "/boards/user.php?settings=1#tabAccountSwitcher";
+			location.reload(true);
+
+		}
+	}
+	
+	if(enableAccountSwitcher)
+	{
+		function loginClickHandler(i) 
+		{
+			return function() 
+			{
+				var key;
+				
+				$.ajax( {
+					type: "GET",
+					url: "/user/logout.html",
+					async: false
+				});			
+						
+				if(!key) 
+				{
+					$.ajax({
+						type: "POST",
+						url: "/",
+						async: false
+					}).done(function(response) {
+						key = response.match(/key" value="([^"]*)"/)[1];
+					});
+				}
+				
+				var formData = "EMAILADDR=" + _SETTINGS_.accounts[i].name + "&PASSWORD=" + _SETTINGS_.accounts[i].pass + "&key=" + 
+								key + "&path=http://www.gamefaqs.com/";
+				
+				$.ajax({
+					type: "POST",
+					url: "/user/login.html",
+					data: formData,
+					async: false
+				}).done(function() {
+					location.reload(true);
+				});
+				
+			}
+		}
+
+		$(".masthead_user").append("<a href='#' id='AccountSwitch'>Account Switcher</a>");
+
+		$("#AccountSwitch").click(function() 
+		{
+
+			var topicForm = "<div id='AccountSwitchPanel' class='reg_dialog' style='position:fixed;left:25%;top:10%;width:50%'>" +
+								"<div style='padding:10px;'><h3>Account Switcher</h3>" +
+								"<p>";
+			
+			topicForm += "<table>";
+			
+			for(var i = 0; i < _SETTINGS_.accounts.length; i++) {
+				topicForm += "<tr><td>" + _SETTINGS_.accounts[i].name + "</td><td><button class='btn' id='asLogin-" + i + "'>Log in</button></td></tr>";
+			}
+				
+			topicForm += "<table>";		
+								
+			topicForm += "<br><button class='btn' id='AccountSwitchClose'>Close</button>" +
+							"</p>" +
+							"</div></div>";
+
+			$("body").append(topicForm);
+			
+			for(var i = 0; i < _SETTINGS_.accounts.length; i++) 
+			{
+				$("#asLogin-" + i).click(loginClickHandler(i));
+			}
+			
+			$("#AccountSwitchClose").click(function() 
+			{
+				$("#AccountSwitchPanel").remove();
+			});
+
+		});
+		
+
+	}
+	
+	var switcherBody = "<h3>Account Switcher Settings</h3>";
+	switcherBody += "<p>Note: This is super dangerous. Passwords are saved unencrypted in localStorage. Please use this with caution. " +
+						"<b>I have no access to your account information and am not liable for anything that may happen as a result of using this feature!</b></p>";
+	
+	switcherBody += "<table>";
+
+	var accNumber= 0;
+	
+	for( accNumber; accNumber < _SETTINGS_.accounts.length; accNumber++) 
+	{
+		switcherBody += "<tr><td>Username</td><td><input id='asUser-" + (accNumber + 1) + "' style='width:100%' value=\"" + 
+						_SETTINGS_.accounts[accNumber].name + "\"></td><td>Password</td><td><input type='password' id='asPass-" + 
+						(accNumber + 1) + "' style='width:100%' value=\"" + _SETTINGS_.accounts[accNumber].pass + 
+						"\"></td><td><button class='btn' id='asDeleteBtn-" + (accNumber + 1) + "'>Remove</button></td></tr>";
+	}
+
+	switcherBody += "<tr><td>Username</td><td><input id='asUser-" + (accNumber + 1) + "' style='width:100%' value=\"" + "" + 
+					"\"></td><td>Password</td><td><input type='password' id='asPass-" + 
+					(accNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td><td><button class='btn' id='asAdd'>Add</button></td></tr>";
+
+	switcherBody += "</table>";
+
+	// End Account Switcher
+	
 	// Link to the Settings Page
 	$(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
 								"</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
@@ -284,7 +426,7 @@ if(jQuery)
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-3'>User Highlighting</a></li>" +
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-4'>Ignore List+</a></li>" +
   							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-5'>Rotating Signatures</a></li>" +
-  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-7'>Account Switcher</a></li>" +
+  							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabAccountSwitcher'>Account Switcher</a></li>" +
    							    "<li class='cnav_item' style='border-radius: 5px; cursor: pointer;'><a href='#tabs-6'>About</a></li>" +
 							    "</ul>" +
 							   
@@ -304,6 +446,7 @@ if(jQuery)
 										"<tr><td style='width:50%'>GameFAQs Avatars</td><td>" + 
 										"<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
 										"<option value='leftLeft'>Left (Message Display Left)</option></select></td></tr>" +
+										"<tr><td style='width:50%'>Account Switcher</td><td><input type='checkbox' id='enableAccountSwitcher'></td></tr>" +
 										"<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
 								    "</table>" +
 							    "</div>" +
@@ -327,11 +470,21 @@ if(jQuery)
    							   //"<div id='tabs-4' style='padding-top:20px'>" + ignoreBody + "</div>" +
    							   //"<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
    							   //"<div id='tabs-6' style='padding-top:20px'>" + aboutBody + "</div>" +
-   							   //"<div id='tabs-7' style='padding-top:20px'>" + switcherBody + "</div>" +
+   							   "<div id='tabAccountSwitcher' style='padding-top:20px'>" + switcherBody + "</div>" +
 							"</div>");
 
 
 	}
+	
+	// More Account Switcher
+	$("#asAdd").click(asAddCallback(accNumber + 1));
+
+	for(var i = 0; i < accNumber; i++) 
+	{
+		$("#asDeleteBtn-" + (i + 1)).click(asDeleteCallback(i + 1));
+	}
+	// End More Account Switcher
+		
 	$(function() {
 		$("#xfaqs-tabs").tabs();
 	});
@@ -347,6 +500,7 @@ if(jQuery)
 		$("#enableYoutube").prop('checked', _SETTINGS_.settings[0].enableYoutube);
 		$("#msgBelowLeftOfPost").prop('checked', _SETTINGS_.settings[0].msgBelowLeftOfPost);
 		$("#enableAvatars").val(_SETTINGS_.settings[0].enableAvatars);
+		$("#enableAccountSwitcher").prop('checked', _SETTINGS_.settings[0].enableAccountSwitcher);
 	});
 
 	// "Save Settings"
@@ -361,6 +515,7 @@ if(jQuery)
 		_SETTINGS_.settings[0].enableYoutube = $('#enableYoutube').is(":checked");
 		_SETTINGS_.settings[0].msgBelowLeftOfPost = $('#msgBelowLeftOfPost').is(":checked");
 		_SETTINGS_.settings[0].enableAvatars = $('#enableAvatars').val()
+		_SETTINGS_.settings[0].enableAccountSwitcher = $('#enableAccountSwitcher').is(":checked");
 		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		document.location = "/boards/user.php?settings=1#settings";
 		location.reload(true);
