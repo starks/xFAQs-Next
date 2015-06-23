@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.0
+// @version      0.1.1
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -666,6 +666,10 @@ if(jQuery)
 		});
 	});
 	// End Avatars Stuff
+
+	// Hotkeys
+	$("input[value='Post Message']").attr("accesskey", "z");
+	$("input[value='Preview Message']").attr("accesskey", "x");
 
 
 }
