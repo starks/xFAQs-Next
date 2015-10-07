@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.4
+// @version      0.1.5
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -475,7 +475,7 @@ if(jQuery)
      
     // Renders the Settings Page.
     if((decodeURIComponent((new RegExp('[?|&]' + "settings" + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20')) == "1") 
-        && (location.pathname == "/boards/user.php")) 
+        && (location.pathname == "/user")) 
     {
         $(".span4").remove();
         $(".span8").css("width", "100%");
@@ -487,7 +487,8 @@ if(jQuery)
         $(".head").remove();
          
         // Preparing for the UI
-        $("tbody").empty();    
+        $("table.board").empty().append('<thead></thead>').append('<tbody></tbody>');
+		$('#js_content_nav').remove();   
          
                 $("tbody").append( "<div id='xfaqs-tabs'>" +
                                 "<ul class='content_nav content_nav_wrap'>" +
