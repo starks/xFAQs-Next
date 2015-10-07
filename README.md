@@ -1,3 +1,6 @@
+# This README is under new management
+Please stand by
+
 # xFAQs-Next
 xFAQs For the New Message Board Beta
 
