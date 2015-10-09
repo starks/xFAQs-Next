@@ -751,6 +751,23 @@ if(jQuery)
     });
     // End Avatars Stuff
  
+	// Rotating sigs
+	if ( enableRotatingSigs ) {
+		var sigList = _SETTINGS_.signatures;
+		var board = $('.page-title').html().trim();
+		if ( sigList ) {
+			var filteredSigList = sigList.filter(function(sig) {
+				return (sig.boards[0] === "" || sig.boards.indexOf(board) !== -1) && 
+						(sig.accounts[0] === "" || sig.accounts.indexOf(_USER_) !== -1);
+			});
+			var randomSig = filteredSigList[Math.floor(Math.random() * filteredSigList.length)].signature;
+			$("input[name='custom_sig']").after("<div class='head'><h2 class='title'>Custom Signature</h2></div>" + 
+												"<textarea name='custom_sig' rows='2' cols='100' style='width:100%;'></textarea>");
+			$("input[name='custom_sig']").remove();
+			$("textarea[name='custom_sig']").val(randomSig);
+		}
+	}
+ 
     // Hotkeys
     $("input[value='Post Message']").attr("accesskey", "z");
     $("input[value='Preview Message']").attr("accesskey", "x");
