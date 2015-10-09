@@ -39,8 +39,8 @@ if(jQuery)
 		var enableQuickTopic = _SETTINGS_.settings[0].enableQuickTopic;
 		
 		// Automatically import signatures from old xFAQs if they don't have any set here
-		if( _SETTINGS_.signatures ) {
-			JSON.parse(localStorage.getItem("sigList").signatures);
+		if( _SETTINGS_.signatures.length === 1 ) {
+			_SETTINGS_.signatures = JSON.parse(localStorage.getItem("sigList")).signatures;
 			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		}
     } else
@@ -472,7 +472,62 @@ if(jQuery)
  
     // End Account Switcher
      
-    // Link to the Settings Page
+	// SIG STUFF
+	var sigBody = "<p style='float:left'>1 line break and 160 characters allowed. Just like with regular sigs.<br> If you want a signature to apply to all boards or accounts leave the field blank.<br>Multiple boards and accounts are separated by commas.</p>";
+	sigBody += " <div style='float:right'><button  class='btn btn_primary' id='sig_export'>Export Signature Data</button> ";
+	sigBody += " <button class='btn' id='sig_import'>Import Signature Data</button></div> ";
+
+
+	// Sig Export Widget.
+	$("body").append("<div id='sigWidget' style='display:none'><p>Save this text data in a text file</p><textarea id='sigbackup' style='width:100%; height:500px;' readonly>" + JSON.stringify(_SETTINGS_.signatures, null, "\t") + "</textarea></div>");
+	$("#sigWidget").dialog({
+		 autoOpen: false,
+		 height: "auto",
+		 width: 1100,
+	});
+
+	// Import Sig Widget
+	$("body").append("<div id='sigWidgetI' style='display:none'><p>Paste the contents of Export Signature Data into this box and click Save.</p><textarea id='siginport' style='width:100%; height:500px;'>" + "" + "</textarea><p><br><button id='okToSaveSig'>Save</button></p></div>");
+	$("#sigWidgetI").dialog({
+		 autoOpen: false,
+		 height: "auto",
+		 width: 1100,
+	}); 
+
+	$("#okToSaveSig").click(function() {
+		var sigData = $("#siginport").val();
+		_SETTINGS_.signatures = JSON.parse(sigData);
+		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		location.reload(true);
+	});
+
+	$("#sigWidget").parent().addClass("reg_dialog");
+	$("#sigWidgetI").parent().addClass("reg_dialog");
+	$("#highlightWidget").parent().addClass("reg_dialog");
+	$("#highlightWidgetI").parent().addClass("reg_dialog");
+	$("button").addClass("btn");
+
+	var sigNumber = 0;
+
+	for( sigNumber; sigNumber < _SETTINGS_.signatures.length; sigNumber++) {
+		sigBody +=	"<table id='sigTable-" + (sigNumber + 1) + "'>" +
+								"<tr><th colspan='2'>Signature " + (sigNumber + 1) + " <input type='submit' class='btn' id='sigBtn-" + (sigNumber + 1) + "' style='float:right; margin-left:10px;' value='Update'><input type='submit' class='btn' id='sigDeleteBtn-" + (sigNumber + 1) + "' style='float:right' value='Delete'></th></tr>" +
+								"<tr><td>Board Names</td><td><input id='boards-" + (sigNumber + 1) + "' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].boards + "\"></td></tr>" +
+								"<tr><td>Accounts</td><td><input id='accounts-" + (sigNumber + 1) + "' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].accounts + "\"></td></tr>" +
+								"<tr><td>Signature</td><td><textarea id='signature-" + (sigNumber + 1) + "' style='width:100%'>" + _SETTINGS_.signatures[sigNumber].signature + "</textarea></td></tr>" +
+							"</table>";
+	}
+
+	sigBody =	"<table id='sigTable-'" + (sigNumber + 1) + ">" +
+							"<tr><th colspan='2'> New Signature <input type='submit' class='btn' id='sigBtn-" + (sigNumber + 1) + "' style='float:right' value='Add'></th></tr>" +
+							"<tr><td>Board Names</td><td><input id='boards-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td></tr>" +
+							"<tr><td>Accounts</td><td><input id='accounts-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td></tr>" +
+							"<tr><td>Signature</td><td><textarea id='signature-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></textarea></td></tr>" +
+						"</table><br>" + sigBody;
+
+	// END OF SIG STUFF
+	
+					// Link to the Settings Page
     $(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
                                 "</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
                                 "<a href='/boards/565885-blood-money/'>xFAQs Help</a></li></ul></span> ");
@@ -551,10 +606,96 @@ if(jQuery)
                                "</div>" +
                                //"<div id='tabs-3' style='padding-top:20px'>" + highlightBody + "</div>" +
                                //"<div id='tabs-4' style='padding-top:20px'>" + ignoreBody + "</div>" +
-                               //"<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
+                               "<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
                                //"<div id='tabs-6' style='padding-top:20px'>" + aboutBody + "</div>" +
                                "<div id='tabAccountSwitcher' style='padding-top:20px'>" + switcherBody + "</div>" +
                             "</div>");
+ 
+	// MORE SIG STUFF
+	
+		function sigClickCallback(i) {
+			return function() {
+				var sigText = $("#signature-" + i).val();
+				var sigLines = (sigText.match(/\n/g)||[]).length;
+				var sigCharacters = sigText.length + sigLines;
+			
+				if((sigLines <= 1) && (sigCharacters <= 160)) { 
+
+					$(".btn").attr("disabled", "disabled");
+					
+					_SETTINGS_.signatures.splice((i-1), 1);	
+					
+					var boardNameArray = $.csv.toArray($("#boards-" + i).val());
+					var accountNameArray = $.csv.toArray($("#accounts-" + i).val());
+						
+					_SETTINGS_.signatures.push( 
+						{
+							"boards": boardNameArray,
+							"accounts": accountNameArray,
+							"signature": $("#signature-" + i).val()
+						});
+
+
+					localStorage.setItem("sigList", JSON.stringify(sigList));
+					document.location = "/boards/user.php?settings=1#tabs-5";
+					location.reload(true);
+				} else {
+					alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
+				}
+			}
+		}
+
+		function sigDeleteCallback(i) {
+			return function() {
+				$("#sigTable-" + i).remove();
+				$(".btn").attr("disabled", "disabled");
+				
+				_SETTINGS_.signatures.splice((i-1), 1);
+				localStorage.setItem("sigList", JSON.stringify(sigList));
+
+				
+				document.location = "/boards/user.php?settings=1#tabs-5";
+				location.reload(true);
+
+			}
+		}
+	
+		for(var i = 0; i < sigNumber; i++) {	
+			$("#sigBtn-" + (i + 1)).button();
+			$("#sigBtn-" + (i + 1)).click(sigClickCallback(i + 1));
+
+			$("#sigDeleteBtn-" + (i + 1)).button();
+			$("#sigDeleteBtn-" + (i + 1)).click(sigDeleteCallback(i + 1));
+		}
+		
+		$("#sigBtn-" + (sigNumber + 1)).button();
+		$("#sigBtn-" + (sigNumber + 1)).click(function() {
+			var sigText = $("#signature-" + (sigNumber + 1)).val();
+			var sigLines = (sigText.match(/\n/g)||[]).length;
+			var sigCharacters = sigText.length + sigLines;
+		
+			if((sigLines <= 1) && (sigCharacters <= 160)) { 
+				$(".btn").attr("disabled", "disabled");
+				
+				var boardNameArray = $.csv.toArray($("#boards-" + (sigNumber + 1)).val());
+				var accountNameArray = $.csv.toArray($("#accounts-" + (sigNumber + 1)).val());
+				
+				_SETTINGS_.signatures.push( 
+					{
+						"boards": boardNameArray,
+						"accounts": accountNameArray,
+						"signature": sigText
+					});
+					
+				localStorage.setItem("sigList", JSON.stringify(_SETTINGS_.signatures));
+				
+				document.location = "/boards/user.php?settings=1#tabs-5";
+				location.reload(true);
+			} else {
+				alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
+			}
+		});
+		// END OF MORE SIG STUFF
  
  
     }
