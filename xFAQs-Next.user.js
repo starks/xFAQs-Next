@@ -37,7 +37,12 @@ if(jQuery)
         var enableAccountSwitcher = _SETTINGS_.settings[0].enableAccountSwitcher;
 		var enableRotatingSigs = _SETTINGS_.settings[0].enableRotatingSigs;
 		var enableQuickTopic = _SETTINGS_.settings[0].enableQuickTopic;
- 
+		
+		// Automatically import signatures from old xFAQs if they don't have any set here
+		if( _SETTINGS_.signatures ) {
+			JSON.parse(localStorage.getItem("sigList").signatures);
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		}
     } else
     {
         var _SETTINGS_ =
