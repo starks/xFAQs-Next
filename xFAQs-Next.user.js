@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.5
+// @version      0.1.5.1
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -256,9 +256,9 @@ if(jQuery)
 	for( var i = 0; i < msgCount; i++) {
 		var user = $(".name").eq(i).text();
 		if($(".msg_stats_left").size() !== 0) {
-			$("a.qq").eq(i).after("<span class='postaction'>" + "<a href='#' class='filter-" + i + "'>filter</a>");
+			$("a.qq").eq(i).parent().after("<span class='postaction'>" + "<a href='#' class='filter-" + i + "'>filter</a>");
 		} else {
-			$("a.qq").eq(i).after("<span class='postaction'>" + "<a href='#' class='filter-" + i + "'>filter</a>");
+			$("a.qq").eq(i).parent().after("<span class='postaction'>" + "<a href='#' class='filter-" + i + "'>filter</a>");
 		}
 		
 		$(".filter-" + i).click(filterCallback(user));
