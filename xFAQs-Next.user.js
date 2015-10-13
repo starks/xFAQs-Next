@@ -612,7 +612,7 @@ if(jQuery)
                             "</div>");
  
 	// MORE SIG STUFF
-	
+	/*
 		function sigClickCallback(i) {
 			return function() {
 				var sigText = $("#signature-" + i).val();
@@ -694,7 +694,7 @@ if(jQuery)
 			} else {
 				alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
 			}
-		});
+		});*/
 		// END OF MORE SIG STUFF
  
  
@@ -906,11 +906,13 @@ if(jQuery)
 				return (sig.boards[0] === "" || sig.boards.indexOf(board) !== -1) && 
 						(sig.accounts[0] === "" || sig.accounts.indexOf(_USER_) !== -1);
 			});
-			var randomSig = filteredSigList[Math.floor(Math.random() * filteredSigList.length)].signature;
-			$("input[name='custom_sig']").after("<div class='head'><h2 class='title'>Custom Signature</h2></div>" + 
-												"<textarea name='custom_sig' rows='2' cols='100' style='width:100%;'></textarea>");
-			$("input[name='custom_sig']").remove();
-			$("textarea[name='custom_sig']").val(randomSig);
+			if (filteredSigList.length) {
+				var randomSig = filteredSigList[Math.floor(Math.random() * filteredSigList.length)].signature;
+				$("input[name='custom_sig']").after("<div class='head'><h2 class='title'>Custom Signature</h2></div>" + 
+													"<textarea name='custom_sig' rows='2' cols='100' style='width:100%;'></textarea>");
+				$("input[name='custom_sig']").remove();
+				$("textarea[name='custom_sig']").val(randomSig);
+			}
 		}
 	}
  
