@@ -510,24 +510,24 @@ if(jQuery)
 	var sigNumber = 0;
 
 	for( sigNumber; sigNumber < _SETTINGS_.signatures.length; sigNumber++) {
-		sigBody +=	"<table id='sigTable-" + (sigNumber + 1) + "'>" +
+		sigBody +=	"<table data-sig-number='" + sigNumber +"'>" +
 								"<tr><th colspan='2'>Signature " + (sigNumber + 1) + " <input type='submit' class='btn' id='sigBtn-" + (sigNumber + 1) + "' style='float:right; margin-left:10px;' value='Update'><input type='submit' class='btn' id='sigDeleteBtn-" + (sigNumber + 1) + "' style='float:right' value='Delete'></th></tr>" +
-								"<tr><td>Board Names</td><td><input id='boards-" + (sigNumber + 1) + "' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].boards + "\"></td></tr>" +
-								"<tr><td>Accounts</td><td><input id='accounts-" + (sigNumber + 1) + "' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].accounts + "\"></td></tr>" +
-								"<tr><td>Signature</td><td><textarea id='signature-" + (sigNumber + 1) + "' style='width:100%'>" + _SETTINGS_.signatures[sigNumber].signature + "</textarea></td></tr>" +
+								"<tr><td>Board Names</td><td><input class='board-names' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].boards + "\"></td></tr>" +
+								"<tr><td>Accounts</td><td><input class='accounts' style='width:100%' value=\"" + _SETTINGS_.signatures[sigNumber].accounts + "\"></td></tr>" +
+								"<tr><td>Signature</td><td><textarea class='signature' style='width:100%'>" + _SETTINGS_.signatures[sigNumber].signature + "</textarea></td></tr>" +
 							"</table>";
 	}
 
-	sigBody =	"<table id='sigTable-'" + (sigNumber + 1) + ">" +
+	sigBody =	"<table id='sigTable-'" + sigNumber + ">" +
 							"<tr><th colspan='2'> New Signature <input type='submit' class='btn' id='sigBtn-" + (sigNumber + 1) + "' style='float:right' value='Add'></th></tr>" +
-							"<tr><td>Board Names</td><td><input id='boards-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td></tr>" +
-							"<tr><td>Accounts</td><td><input id='accounts-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td></tr>" +
-							"<tr><td>Signature</td><td><textarea id='signature-" + (sigNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></textarea></td></tr>" +
+							"<tr><td>Board Names</td><td><input class='board-names' style='width:100%' value=\"" + "" + "\"></td></tr>" +
+							"<tr><td>Accounts</td><td><input class='accounts' style='width:100%' value=\"" + "" + "\"></td></tr>" +
+							"<tr><td>Signature</td><td><textarea class='signature' style='width:100%' value=\"" + "" + "\"></textarea></td></tr>" +
 						"</table><br>" + sigBody;
 
 	// END OF SIG STUFF
 	
-					// Link to the Settings Page
+	// Link to the Settings Page
     $(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
                                 "</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
                                 "<a href='/boards/565885-blood-money/'>xFAQs Help</a></li></ul></span> ");
@@ -612,39 +612,37 @@ if(jQuery)
                             "</div>");
  
 	// MORE SIG STUFF
-	/*
-		function sigClickCallback(i) {
-			return function() {
-				var sigText = $("#signature-" + i).val();
-				var sigLines = (sigText.match(/\n/g)||[]).length;
-				var sigCharacters = sigText.length + sigLines;
-			
-				if((sigLines <= 1) && (sigCharacters <= 160)) { 
-
-					$(".btn").attr("disabled", "disabled");
-					
-					_SETTINGS_.signatures.splice((i-1), 1);	
-					
-					var boardNameArray = $.csv.toArray($("#boards-" + i).val());
-					var accountNameArray = $.csv.toArray($("#accounts-" + i).val());
-						
-					_SETTINGS_.signatures.push( 
-						{
-							"boards": boardNameArray,
-							"accounts": accountNameArray,
-							"signature": $("#signature-" + i).val()
-						});
-
-
-					localStorage.setItem("sigList", JSON.stringify(sigList));
-					document.location = "/boards/user.php?settings=1#tabs-5";
-					location.reload(true);
-				} else {
-					alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
-				}
+		function sigClickCallback($entry, index) {
+			var sigText = $entry.find('.signature').val();
+			var sigLines = (sigText.match(/\n/g)||[]).length;
+			var sigCharacters = sigText.length + sigLines;
+		
+			if((sigLines > 1) || (sigCharacters > 160)) {
+				alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
+				return;
 			}
-		}
+			
+			$(".btn").attr("disabled", "disabled");
+			
+			_SETTINGS_.signatures.splice((index-1), 1);	
+			
+			var boardNameArray = $entry.find('.board-names').val().split(',');
+			var accountNameArray = $entry.find('.accounts').val().split(',');
+				
+			_SETTINGS_.signatures.push( 
+				{
+					"boards": boardNameArray,
+					"accounts": accountNameArray,
+					"signature": sigText
+				});
 
+			console.log(_SETTINGS_.signatures); //TODO: remove
+				
+			localStorage.setItem("sigList", JSON.stringify(sigList));
+			document.location = "/boards/user.php?settings=1#tabs-5";
+			location.reload(true);
+		}
+	/*
 		function sigDeleteCallback(i) {
 			return function() {
 				$("#sigTable-" + i).remove();
