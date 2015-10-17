@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.5.1
+// @version      0.1.6
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -37,7 +37,12 @@ if(jQuery)
         var enableAccountSwitcher = _SETTINGS_.settings[0].enableAccountSwitcher;
 		var enableRotatingSigs = _SETTINGS_.settings[0].enableRotatingSigs;
 		var enableQuickTopic = _SETTINGS_.settings[0].enableQuickTopic;
- 
+		
+		// Automatically import signatures from old xFAQs if they don't have any set here
+		if( _SETTINGS_.signatures.length === 1 ) {
+			_SETTINGS_.signatures = JSON.parse(localStorage.getItem("sigList")).signatures;
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		}
     } else
     {
         var _SETTINGS_ =
@@ -464,10 +469,61 @@ if(jQuery)
                     (accNumber + 1) + "' style='width:100%' value=\"" + "" + "\"></td><td><button class='btn' id='asAdd'>Add</button></td></tr>";
  
     switcherBody += "</table>";
- 
     // End Account Switcher
      
-    // Link to the Settings Page
+	// SIG STUFF
+	var sigBody = "<p style='float:left'>1 line break and 160 characters allowed. Just like with regular sigs.<br> If you want a signature to apply to all boards or accounts leave the field blank.<br>Multiple boards and accounts are separated by commas.</p>";
+	sigBody += " <div style='float:right'><button  class='btn btn_primary' id='sig-export'>Export Signature Data</button> ";
+	sigBody += " <button class='btn' id='sig-import'>Import Signature Data</button></div> ";
+
+	// Sig Export Widget.
+	$("body").append("<div id='sigWidget' style='display:none'><p>Save this text data in a text file</p><textarea id='sigbackup' style='width:100%; height:500px;' readonly>" + JSON.stringify(_SETTINGS_.signatures, null, "\t") + "</textarea></div>");
+	$("#sigWidget").dialog({
+		 autoOpen: false,
+		 height: "auto",
+		 width: 1100,
+	});
+
+	// Sig Import Widget
+	$("body").append("<div id='sigWidgetI' style='display:none'><p>Paste the contents of Export Signature Data into this box and click Save.</p><textarea id='sig-import-text' style='width:100%; height:500px;'>" + "" + "</textarea><p><br><button id='okToSaveSig'>Save</button></p></div>");
+	$("#sigWidgetI").dialog({
+		 autoOpen: false,
+		 height: "auto",
+		 width: 1100,
+	}); 
+
+	$("#okToSaveSig").click(function() {
+		var sigData = $("#sig-import-text").val();
+		_SETTINGS_.signatures = JSON.parse(sigData);
+		localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		location.reload(true);
+	});
+
+	$("#sigWidget").parent().addClass("reg_dialog");
+	$("#sigWidgetI").parent().addClass("reg_dialog");
+	$("button").addClass("btn");
+	
+	function createSigChangeMarkup(sig, index){
+		return 	"<tr class='signature-header-row'><th colspan='2'>Signature " + (index + 1) + " <input type='submit' class='sig-update btn' style='float:right; margin-left:10px;' value='Update'><input type='submit' class='sig-delete btn' style='float:right' value='Delete'></th></tr>" +
+			"<tr class='board-names-row'><td>Board Names</td><td><input class='board-names' style='width:100%' value=\"" + sig.boards + "\"></td></tr>" +
+			"<tr class='accounts-row'><td>Accounts</td><td><input class='accounts' style='width:100%' value=\"" + sig.accounts + "\"></td></tr>" +
+			"<tr class='signature-row'><td>Signature</td><td><textarea class='signature' style='width:100%'>" + sig.signature + "</textarea></td></tr>";
+	}
+	
+	sigBody +=	"<table id='existing-sigs'>" +
+					"<tr class='signature-header-row'><th colspan='2'> New Signature <input type='submit' class='sig-new btn' style='float:right' value='Add'></th></tr>" +
+					"<tr class='board-names-row'><td>Board Names</td><td><input class='board-names' style='width:100%'></td></tr>" +
+					"<tr class='accounts-row'><td>Accounts</td><td><input class='accounts' style='width:100%'></td></tr>" +
+					"<tr class='signature-row'><td>Signature</td><td><textarea class='signature' style='width:100%'></textarea></td></tr>";
+	
+	_SETTINGS_.signatures.forEach(function(sig, index){
+		sigBody += createSigChangeMarkup(sig, index);
+	});
+	
+	sigBody += "</table><br>";
+	// END OF SIG STUFF
+	
+	// Link to the Settings Page
     $(".masthead_user").prepend("<span class='masthead_mygames_drop'><a href='/boards/user.php?settings=1'>xFAQs Settings <i class='icon icon-cog'></i>" + 
                                 "</a><ul class='masthead_mygames_subnav' style='width:200px;left:-1px;'><li class='masthead_mygames_subnav_item'>" + 
                                 "<a href='/boards/565885-blood-money/'>xFAQs Help</a></li></ul></span> ");
@@ -523,7 +579,7 @@ if(jQuery)
                                         "<option value='topLeft'>Left (Message Display Top)</option>" +
                                         "<option value='topRight'>Right (Message Display Top)</option></select></td></tr>" +										
                                         "<tr><td style='width:50%'>Account Switcher</td><td><input type='checkbox' id='enableAccountSwitcher'></td></tr>" +
-                                        //"<tr><td style='width:50%'>Rotating Sigs</td><td><input type='checkbox' id='enableRotatingSigs'></td></tr>" +	
+                                        "<tr><td style='width:50%'>Rotating Sigs</td><td><input type='checkbox' id='enableRotatingSigs'></td></tr>" +	
                                         "<tr><td style='width:50%'>Quick Topic</td><td><input type='checkbox' id='enableQuickTopic'></td></tr>" +																														
                                         "<tr><td colspan='2'><input type='submit' id='updateGeneral' class='btn' value='Update xFAQs Settings'></td></tr>" +
                                     "</table>" +
@@ -546,12 +602,56 @@ if(jQuery)
                                "</div>" +
                                //"<div id='tabs-3' style='padding-top:20px'>" + highlightBody + "</div>" +
                                //"<div id='tabs-4' style='padding-top:20px'>" + ignoreBody + "</div>" +
-                               //"<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
+                               "<div id='tabs-5' style='padding-top:20px'>" + sigBody + "</div>" +
                                //"<div id='tabs-6' style='padding-top:20px'>" + aboutBody + "</div>" +
                                "<div id='tabAccountSwitcher' style='padding-top:20px'>" + switcherBody + "</div>" +
                             "</div>");
  
- 
+	// MORE SIG STUFF
+		function sigClickCallback($entry, index) {
+			var sigText = $entry.nextAll('.signature-row').first().find('.signature').val();
+			var sigLines = (sigText.match(/\n/g)||[]).length;
+			var sigCharacters = sigText.length + sigLines;
+		
+			if((sigLines > 1) || (sigCharacters > 160)) {
+				alert("Signature is too long. " + sigLines + " breaks and " + sigCharacters + " characters.");
+				return;
+			}
+			
+			var boardNameArray = $entry.nextAll('.board-names-row').first().find('.board-names').val().split(/ *, */);
+			var accountNameArray = $entry.nextAll('.accounts-row').first().find('.accounts').val().split(/ *, */);
+			var newSigData = {
+				"boards": boardNameArray,
+				"accounts": accountNameArray,
+				"signature": sigText
+			};
+			
+			if (index === undefined) { // Adding a new sig
+				_SETTINGS_.signatures.push(newSigData);
+				$entry.closest('tbody').append(createSigChangeMarkup(newSigData,_SETTINGS_.signatures.length - 1));
+				$entry.nextAll('.signature-row').first().find('.signature').val('Signature added successfully');
+			}
+			else { //Updating an old sig
+				_SETTINGS_.signatures[index] = newSigData;
+				$entry.find('.sig-update').val('Updated.');
+			}
+			
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		}
+
+		function sigDeleteCallback($entry, index) {
+			$entry.nextUntil('.signature-header-row').addBack().remove();
+			_SETTINGS_.signatures.splice((i-1), 1);
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		}
+		
+		$('#existing-sigs').on('click', '.sig-update', function(){sigClickCallback($(this).closest('tr'), $('#existing-sigs .sig-update').index(this));});
+		$('#existing-sigs').on('click', '.sig-new', function(){sigClickCallback($(this).closest('tr'));});
+		$('#existing-sigs').on('click', '.sig-delete', function(){sigDeleteCallback($(this).closest('tr'), $('#existing-sigs .sig-delete').index(this));});
+		$("#sig-export").click(function(){$("#sigWidget").dialog("open");});
+		$("#sig-import").click(function(){$("#sigWidgetI").dialog("open");});
+		// END OF MORE SIG STUFF
+		
     }
      
     // More Account Switcher
@@ -750,6 +850,25 @@ if(jQuery)
         });
     });
     // End Avatars Stuff
+ 
+	// Rotating sigs
+	if ( enableRotatingSigs ) {
+		var sigList = _SETTINGS_.signatures;
+		var board = $('.page-title').html().trim();
+		if ( sigList ) {
+			var filteredSigList = sigList.filter(function(sig) {
+				return (sig.boards[0] === "" || sig.boards.indexOf(board) !== -1) && 
+						(sig.accounts[0] === "" || sig.accounts.indexOf(_USER_) !== -1);
+			});
+			if (filteredSigList.length) {
+				var randomSig = filteredSigList[Math.floor(Math.random() * filteredSigList.length)].signature;
+				$("input[name='custom_sig']").after("<div class='head'><h2 class='title'>Custom Signature</h2></div>" + 
+													"<textarea name='custom_sig' rows='2' cols='100' style='width:100%;'></textarea>");
+				$("input[name='custom_sig']").remove();
+				$("textarea[name='custom_sig']").val(randomSig);
+			}
+		}
+	}
  
     // Hotkeys
     $("input[value='Post Message']").attr("accesskey", "z");
