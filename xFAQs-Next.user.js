@@ -628,7 +628,8 @@ if(jQuery)
 			
 			if (index === undefined) { // Adding a new sig
 				_SETTINGS_.signatures.push(newSigData);
-				$entry.nextAll('.signature-row').first().after(createSigChangeMarkup(newSigData,_SETTINGS_.signatures.length - 1)).find('.signature').val('');
+				$entry.closest('tbody').append(createSigChangeMarkup(newSigData,_SETTINGS_.signatures.length - 1));
+				$entry.nextAll('.signature-row').first().find('.signature').val('Signature added successfully');
 			}
 			else { //Updating an old sig
 				_SETTINGS_.signatures[index] = newSigData;
