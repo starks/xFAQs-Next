@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.5
+// @version      0.1.6
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -618,8 +618,8 @@ if(jQuery)
 				return;
 			}
 			
-			var boardNameArray = $entry.nextAll('.board-names-row').first().find('.board-names').val().split(',');
-			var accountNameArray = $entry.nextAll('.accounts-row').first().find('.accounts').val().split(',');
+			var boardNameArray = $entry.nextAll('.board-names-row').first().find('.board-names').val().split(/ *, */);
+			var accountNameArray = $entry.nextAll('.accounts-row').first().find('.accounts').val().split(/ *, */);
 			var newSigData = {
 				"boards": boardNameArray,
 				"accounts": accountNameArray,
@@ -632,7 +632,7 @@ if(jQuery)
 			}
 			else { //Updating an old sig
 				_SETTINGS_.signatures[index] = newSigData;
-				$entry.find('.sig-update').text('Updated.');
+				$entry.find('.sig-update').val('Updated.');
 			}
 			
 			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
