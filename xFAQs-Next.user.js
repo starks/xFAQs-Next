@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.6.2
+// @version      0.1.6.3
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
@@ -9,8 +9,7 @@
 // @noframes
 // ==/UserScript==
  
-// http://www.nostlagiasky.pw
-// https://github.com/Kraust/xFAQs-Next
+// https://github.com/N-eil/xFAQs-Next
  
 // TODOs:
 // 3. Get the "MASTER" User Variable to work in all cases
@@ -42,6 +41,17 @@ if(jQuery)
 		// Automatically import signatures from old xFAQs if they don't have any set here
 		if( _SETTINGS_.signatures.length === 1 && localStorage.getItem('sigList')) {
 			_SETTINGS_.signatures = JSON.parse(localStorage.getItem("sigList")).signatures;
+			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+		}
+
+		if (!(_SETTINGS_.signatures instanceof Array)) { //Some people had issues with signatures not being an array, not sure how that happened but this will restore it
+			_SETTINGS_.signatures = [
+                    {
+                        "boards": [""],
+                        "accounts": [""],
+                        "signature": "powered by xfaqs"
+                    }
+            ];
 			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		}
     } else
