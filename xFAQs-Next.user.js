@@ -38,6 +38,12 @@ if(jQuery)
 		var enableRotatingSigs = _SETTINGS_.settings[0].enableRotatingSigs;
 		var enableQuickTopic = _SETTINGS_.settings[0].enableQuickTopic;
  
+ 		// Automatically convert old enableAvatars "topLeft" and "leftLeft" values to "left"
+        // to allow easy conversion from old xFAQs versions of the enableAvatars setting
+        if (enableAvatars === "topLeft" || enableAvatars === "leftLeft") {
+            _SETTINGS_.settings[0].enableAvatars = enableAvatars = "left";
+            localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
+        }
     } else
     {
         var _SETTINGS_ =
@@ -286,20 +292,31 @@ if(jQuery)
      
     // Render Avatars
 
-	if ( enableAvatars == "topLeft" ) {
-		$(".msg_body").css("padding-left", "115px");
-		$(".msg_infobox").css("clear", "both");
-		$(".msg_below").css("clear", "both");
-		$(".msg_body").each(function( index )
-		{
-			var post_user = $(".name").eq(index).text().slice(0, - 1).replace(/ /g,"_");
-			$(this).before("<div style='top:45px;padding:.5em;float:left'><img src='http://avatarfaqs.pcriot.com/avatars/" + post_user +".png' /></div>");
-		});
+	if ( enableAvatars === "left") {
+        switch($(".msg_infobox").css("display")) {
+            case "block": // Message Display Top
+        		$(".msg_body").css("padding-left", "115px");
+        		$(".msg_infobox").css("clear", "both");
+        		$(".msg_below").css("clear", "both");
+        		$(".msg_body").each(function( index )
+        		{
+        			var post_user = $(".name").eq(index).text().slice(0, - 1).replace(/ /g,"_");
+        			$(this).before("<div style='top:45px;padding:.5em;float:left'><img src='http://avatarfaqs.pcriot.com/avatars/" + post_user +".png' /></div>");
+        		});
 
-		$('img').error(function () {
-			$(this).hide();
-		});				
-	} else if (enableAvatars == "topRight" ) {		
+        		$('img').error(function () {
+        			$(this).hide();
+        		});
+                break;
+
+            case "table-cell":
+                $(".msg_infobox").each(function( index ) {
+                    var post_user = $(".name").eq(index).text().slice(0, - 1).replace(/ /g,"_");
+                    $(".msg_infobox > .user").eq(index).after("<img src='http://avatarfaqs.pcriot.com/avatars/" + post_user +".png' />");
+                });
+                break;
+        }
+	} else if (enableAvatars == "topRight") {
 
 		$(".msg_body").css("margin-right", "115px");
 		$(".msg_infobox").css("clear", "both");
@@ -313,16 +330,6 @@ if(jQuery)
 		$('img').error(function () {
 			$(this).hide();
 		});
-	} else if (enableAvatars == "leftLeft") {
-		
-		$(".msg_infobox").each(function( index )
-		{
-			var post_user = $(".name").eq(index).text().slice(0, - 1).replace(/ /g,"_");
-			$(".msg_infobox > .user").eq(index).after("<img src='http://avatarfaqs.pcriot.com/avatars/" + post_user +".png' />");
-		});
-	} else { // disabled
-
-
 	}
 			
     // End Avatar Options
@@ -518,10 +525,9 @@ if(jQuery)
                                         "<tr><td style='width:50%'>Embedded Youtube</td><td><input type='checkbox' id='enableYoutube'></td></tr>" +
                                         "<tr><td style='width:50%'>quote, edit, ect. in Message Display Left <i class='icon icon-question-sign' title='Note: If this is enabled while in Message Display Above mode, things will look weird'></i></td><td><input type='checkbox' id='msgBelowLeftOfPost'></td></tr>" +
                                         "<tr><td style='width:50%'>GameFAQs Avatars</td><td>" + 
-                                        "<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
-                                        "<option value='leftLeft'>Left (Message Display Left)</option>" +
-                                        "<option value='topLeft'>Left (Message Display Top)</option>" +
-                                        "<option value='topRight'>Right (Message Display Top)</option></select></td></tr>" +										
+                                         "<select id='enableAvatars'><option value='disabled'>Disabled</option>" + 
+                                        "<option value='left'>Left</option>" +
+                                        "<option value='topRight'>Right (Message Display Top)</option></select></td></tr>" +
                                         "<tr><td style='width:50%'>Account Switcher</td><td><input type='checkbox' id='enableAccountSwitcher'></td></tr>" +
                                         //"<tr><td style='width:50%'>Rotating Sigs</td><td><input type='checkbox' id='enableRotatingSigs'></td></tr>" +	
                                         "<tr><td style='width:50%'>Quick Topic</td><td><input type='checkbox' id='enableQuickTopic'></td></tr>" +																														
