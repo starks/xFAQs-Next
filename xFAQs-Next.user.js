@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         xFAQs-Next
 // @namespace    xfaqs
-// @version      0.1.6
+// @version      0.1.6.1
 // @description  xFAQs For the New Message Board Beta
 // @author       @Kraust / Judgmenl
 // @match        http://*.gamefaqs.com/*
 // @grant        none
+// @noframes
 // ==/UserScript==
  
 // http://www.nostlagiasky.pw
@@ -39,7 +40,7 @@ if(jQuery)
 		var enableQuickTopic = _SETTINGS_.settings[0].enableQuickTopic;
 		
 		// Automatically import signatures from old xFAQs if they don't have any set here
-		if( _SETTINGS_.signatures.length === 1 ) {
+		if( _SETTINGS_.signatures.length === 1 && localStorage.getItem('siglist')) {
 			_SETTINGS_.signatures = JSON.parse(localStorage.getItem("sigList")).signatures;
 			localStorage.setItem("_SETTINGS_", JSON.stringify(_SETTINGS_));
 		}
